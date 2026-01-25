@@ -16,9 +16,9 @@ jobs:
 
     steps:
       - name: 🚚 Check out repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: 🔒 Update lock file
-        uses: 5ouma/utils/update-deno-lock-file@1409b1a854917a5e6a05730772f815534e671981 # v0.8.2
+        uses: 5ouma/utils/update-deno-lock-file@da6ac93770103bb5e35b8fae7e213628e324eb7a # v0.8.3
