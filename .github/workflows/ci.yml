@@ -16,22 +16,27 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-check:
     name: 🧹 Lint Check
     runs-on: Ubuntu-Slim
-    timeout-minutes: 1
+    timeout-minutes: 2
 
     steps:
       - name: 🚚 Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: 🦕 Set up Deno
         id: setup-deno
-        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2.0.3
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
+          deno-version: 2.9.5
           cache: true
 
       - name: 📦 Install dependencies
@@ -47,16 +52,18 @@ jobs:
   format-check:
     name: 📝 Format Check
     runs-on: Ubuntu-Slim
-    timeout-minutes: 1
+    timeout-minutes: 2
 
     steps:
       - name: 🚚 Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: 🦕 Set up Deno
-        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2.0.3
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: 2.9.5
 
       - name: 📝 Format check
         run: deno fmt --check
@@ -64,18 +71,19 @@ jobs:
   type-check:
     name: 🔍 Type Check
     runs-on: Ubuntu-Slim
-    timeout-minutes: 1
+    timeout-minutes: 2
 
     steps:
       - name: 🚚 Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: 🦕 Set up Deno
         id: setup-deno
-        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2.0.3
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
+          deno-version: 2.9.5
           cache: true
 
       - name: 📦 Install dependencies
@@ -88,19 +96,22 @@ jobs:
   test:
     name: 🧪 Test
     runs-on: Ubuntu-Slim
-    environment: CI
-    timeout-minutes: 1
+    environment:
+      name: CI
+      deployment: false
+    timeout-minutes: 2
 
     steps:
       - name: 🚚 Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: 🦕 Set up Deno
         id: setup-deno
-        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2.0.3
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
+          deno-version: 2.9.5
           cache: true
 
       - name: 📦 Install dependencies
@@ -111,13 +122,13 @@ jobs:
         run: deno task test:cov
 
       - name: ☂️ Upload coverage
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: ☂️ Upload test results
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           report_type: test_results
@@ -125,16 +136,18 @@ jobs:
   dry-run-publish:
     name: 📦 Dry Run Publish
     runs-on: Ubuntu-Slim
-    timeout-minutes: 1
+    timeout-minutes: 2
 
     steps:
       - name: 🚚 Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: 🦕 Set up Deno
-        uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2.0.3
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: 2.9.5
 
       - name: 📦 Dry run publish
         run: deno publish --dry-run

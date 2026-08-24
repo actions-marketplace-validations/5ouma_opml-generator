@@ -8,14 +8,18 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pre-commit:
     name: 🚸 pre-commit
     runs-on: Ubuntu-Latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: 🚸 Run pre-commit
-        uses: 5ouma/utils/pre-commit@e3ddd062e52b578a512e70d94994624f5fa914cd # v0.9.0
+        uses: 5ouma/utils/pre-commit@6936a0ea78546063fc4661ae07f6c0ebdf5a6039 # v0.12.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

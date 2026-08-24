@@ -15,7 +15,9 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: Ubuntu-Slim
-    environment: Release
+    environment:
+      name: Release
+      deployment: false
     timeout-minutes: 1
     outputs:
       tag: ${{ steps.tagpr.outputs.tag }}
@@ -23,25 +25,31 @@ jobs:
     steps:
       - name: 💳 Create GitHub App Token
         id: app-token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          app-id: ${{ vars.APP_ID }}
+          client-id: ${{ vars.CLIENT_ID }}
           private-key: ${{ secrets.PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
 
       - name: 🚚 Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           token: ${{ steps.app-token.outputs.token }}
-          persist-credentials: true
+          persist-credentials: false
 
-      - name: 🏷️ Release a New Version
+      - name: 🔐 Set up Credential Helper
+        run: gh auth setup-git
+        env:
+          GH_HOST: github.com
+
+      - name: 🔖 Release a new version
         id: tagpr
-        uses: Songmu/tagpr@b3fb89424646b06c8aa460f50307c60b6a541425 # v1.17.1
+        uses: Songmu/tagpr@d1b8138b7a31075141b6cd64103de9485ced7ac9 # v1.20.1
         with:
           config: .github/tagpr.ini
         env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
   publish:
@@ -56,7 +64,7 @@ jobs:
 
     steps:
       - name: 🚚 Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
